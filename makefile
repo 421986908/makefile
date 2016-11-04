@@ -3,34 +3,37 @@ AR = ar
 LD = ld
 WAY = execute
 CC_FLAG = -g #-fPIC
+CPP_FLAG = -g
  
 INC = 
 LIB = 
 
 SRC = $(wildcard $(shell pwd)/*.c)
 PC_SRC = $(wildcard $(shell pwd)/*.pc)
+CPP_SRC = $(wildcard $(shell pwd)/*.cpp)
 OBJ = $(patsubst %.c,%.o,$(SRC))
 PC_OBJ = $(patsubst %.pc,%.o,$(PC_SRC))
+CPP_OBJ = $(patsubst %.cpp,%.o,$(CPP_SRC))
 
-TARGETPATH = 
-TARGET = 
+TARGETPATH = .
+TARGET = a.out
 
 #多目标编译方式
 #TARGETPATH = 
 #TARGET = $(patsubst %.c, %, $(SRC))
  
 ifeq ($(WAY),staticlibrary)
-all:$(OBJ) $(PC_OBJ)
+all:$(OBJ) $(PC_OBJ) $(CPP_OBJ)
 	${AR} rv $(TARGETPATH)/${TARGET} $?
 endif
 
 ifeq ($(WAY),dynamiclibrary)
-all:$(OBJ) $(PC_OBJ)
+all:$(OBJ) $(PC_OBJ) $(CPP_OBJ)
 	$(CC) $? -shared -o $(TARGETPATH)/$(TARGET)
 endif
 
 ifeq ($(WAY),execute)
-all:$(OBJ) $(PC_OBJ)
+all:$(OBJ) $(PC_OBJ) $(CPP_OBJ)
 	$(CC) $(LIB) $? -o $(TARGETPATH)/$(TARGET)
 endif
 
@@ -44,6 +47,9 @@ endif
 $(OBJ):%.o:%.c
 	$(CC) $(CC_FLAG) $(INC) -c $< -o $@
 
+$(CPP_OBJ):%.o:%.cpp
+	$(CC) $(CPP_FLAG) $(INC) -c $< -o $@
+
 $(PC_OBJ):%.o:%.pc
 	proc $(CCOMPSWITCH) include=$(TOPDIR)/include iname=$< oname=$(patsubst %.pc,%.c,$<) code=ANSI_C USERID=$(DBUSER)/$(DBPASSWD) DYNAMIC=ANSI
 	$(CC) $(CC_FLAG) $(INC) -c $(patsubst %.pc,%.c,$<) -o $@
@@ -52,4 +58,4 @@ $(PC_OBJ):%.o:%.pc
 .PRONY:clean
 clean:
 	@echo "Removing linked and compiled files......"
-	rm -f $(OBJ) $(PC_OBJ) $(TARGETPATH)/$(TARGET)
+	rm -f $(OBJ) $(PC_OBJ) $(CPP_OBJ) $(TARGETPATH)/$(TARGET)
