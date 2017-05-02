@@ -8,6 +8,7 @@ CPP_FLAG = -g
 INC = 
 LIB = 
 
+
 SRC = $(wildcard $(shell pwd)/*.c)
 PC_SRC = $(wildcard $(shell pwd)/*.pc)
 CPP_SRC = $(wildcard $(shell pwd)/*.cpp)
